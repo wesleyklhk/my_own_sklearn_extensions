@@ -10,6 +10,9 @@ class DecisionTreeClassifierWithDecisionRules(DecisionTreeClassifier):
         Y_COLUMN_TMPL = Y_PREFIX + '{}'
         LEAVE_ID_COLUMN = '__leave_id'
 
+        DECISION_RULES_CONDITION_COL = 'condition'
+        DECISION_RULES_LEAF_ID_COL = 'leaf_id'
+
         n_nodes = self.tree_.node_count
         children_left = self.tree_.children_left
         children_right = self.tree_.children_right
@@ -35,7 +38,7 @@ class DecisionTreeClassifierWithDecisionRules(DecisionTreeClassifier):
 
         node_indicator = self.decision_path(all_paths_with_x_and_probs[cols])
         
-        case_stmt_src = []
+        decision_rules = []
         for sample_id in range(len(all_paths_with_x_and_probs)):
             current_row = all_paths_with_x_and_probs.iloc[sample_id]
             leave_id = current_row[LEAVE_ID_COLUMN]
@@ -56,13 +59,13 @@ class DecisionTreeClassifierWithDecisionRules(DecisionTreeClassifier):
 
                 conditions.append( subcondition_tmpl.format(cols[feature[node_id]] , threshold_sign , threshold[node_id]) )
             
-            tobeinserted = {'when_clause':' AND '.join(conditions),'leaf_id':leave_id}
+            tobeinserted = {DECISION_RULES_CONDITION_COL:' AND '.join(conditions),DECISION_RULES_LEAF_ID_COL:leave_id}
             for col in ys_cols:
                 tobeinserted[col.replace(Y_PREFIX,'')] = current_row[col]
             
-            case_stmt_src.append( tobeinserted )
+            decision_rules.append( tobeinserted )
 
-        self.case_stmt_src = pd.DataFrame(case_stmt_src)
+        self.decision_rules = pd.DataFrame(decision_rules)
         return self
             
         
@@ -73,4 +76,4 @@ y = ['A'] * 300 + ['B'] * 300 + ['C'] * 400
 
 clf2 = DecisionTreeClassifierWithDecisionRules(random_state=0,criterion='entropy',**{'max_depth': 3, 'min_samples_leaf': 1, 'min_samples_split': 0.01})
 clf2.fit(X=X,y=y)
-print(clf2.case_stmt_src)
+print(clf2.decision_rules)
