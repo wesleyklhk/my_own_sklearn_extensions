@@ -70,10 +70,10 @@ class DecisionTreeClassifierWithDecisionRules(DecisionTreeClassifier):
             
         
 
+if __name__ == '__main__':
+    X = pd.DataFrame(np.random.randn(1000, 50),columns=['feature_{}'.format(i) for i in range(50)])
+    y = ['A'] * 300 + ['B'] * 300 + ['C'] * 400
 
-X = pd.DataFrame(np.random.randn(1000, 50),columns=['feature_{}'.format(i) for i in range(50)])
-y = ['A'] * 300 + ['B'] * 300 + ['C'] * 400
-
-clf2 = DecisionTreeClassifierWithDecisionRules(random_state=0,criterion='entropy',**{'max_depth': 3, 'min_samples_leaf': 1, 'min_samples_split': 0.01})
-clf2.fit(X=X,y=y)
-print(clf2.decision_rules)
+    clf2 = DecisionTreeClassifierWithDecisionRules(random_state=0,criterion='entropy',**{'max_depth': 3, 'min_samples_leaf': 1, 'min_samples_split': 0.01})
+    clf2.fit(X=X,y=y)
+    print(clf2.decision_rules)
