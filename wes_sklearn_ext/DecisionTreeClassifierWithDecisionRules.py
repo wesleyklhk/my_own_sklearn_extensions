@@ -4,8 +4,7 @@ import pdb
 from sklearn.tree import DecisionTreeClassifier
 
 class DecisionTreeClassifierWithDecisionRules(DecisionTreeClassifier):
-    def fit(self,**kwargs):
-        super().fit(**kwargs)
+    def decision_rules_report(self,X):
         Y_PREFIX = '__y_'
         Y_COLUMN_TMPL = Y_PREFIX + '{}'
         LEAVE_ID_COLUMN = '__leave_id'
@@ -19,8 +18,7 @@ class DecisionTreeClassifierWithDecisionRules(DecisionTreeClassifier):
         feature = self.tree_.feature
         threshold = self.tree_.threshold
 
-        X = pd.DataFrame(kwargs['X'])
-        y = kwargs['y']
+        X = pd.DataFrame(X)
         cols = X.columns.tolist()
         tmp = X.copy()
         tmp[LEAVE_ID_COLUMN] = self.apply(X[cols])
@@ -66,7 +64,10 @@ class DecisionTreeClassifierWithDecisionRules(DecisionTreeClassifier):
             decision_rules.append( tobeinserted )
 
         self.decision_rules = pd.DataFrame(decision_rules)
-        return self
+        return self.decision_rules
+        
+
+
             
         
 
@@ -75,5 +76,21 @@ if __name__ == '__main__':
     y = ['A'] * 300 + ['B'] * 300 + ['C'] * 400
 
     clf2 = DecisionTreeClassifierWithDecisionRules(random_state=0,criterion='entropy',**{'max_depth': 3, 'min_samples_leaf': 1, 'min_samples_split': 0.01})
-    clf2.fit(X=X,y=y)
-    print(clf2.decision_rules)
+    clf2.fit(X,y)
+    print(clf2.decision_rules_report(X))
+
+
+    #######converting existing DecisionTreeClassifier into DecisionTreeClassifierWithDecisionRules
+    from copy import deepcopy
+    clf = DecisionTreeClassifier(random_state=0,criterion='entropy',**{'max_depth': 3, 'min_samples_leaf': 1, 'min_samples_split': 0.01})
+    clf.fit(X,y)
+
+    clf_clone = deepcopy(clf)
+
+    clf2 = clf_clone
+    clf2.__class__ = DecisionTreeClassifierWithDecisionRules
+    print( clf2.decision_rules_report(X) )
+
+
+
+    
