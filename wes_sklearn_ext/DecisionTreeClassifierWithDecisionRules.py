@@ -2,8 +2,16 @@ import numpy as np
 import pandas as pd
 import pdb
 from sklearn.tree import DecisionTreeClassifier
+from copy import deepcopy
 
 class DecisionTreeClassifierWithDecisionRules(DecisionTreeClassifier):
+    def wrap_DecisionTreeClassifier(dt_clf):
+        clf_clone = deepcopy(clf)
+        clf2 = clf_clone
+        clf2.__class__ = DecisionTreeClassifierWithDecisionRules        
+        return clf2
+
+
     def decision_rules_report(self,X):
         Y_PREFIX = '__y_'
         Y_COLUMN_TMPL = Y_PREFIX + '{}'
@@ -85,10 +93,13 @@ if __name__ == '__main__':
     clf = DecisionTreeClassifier(random_state=0,criterion='entropy',**{'max_depth': 3, 'min_samples_leaf': 1, 'min_samples_split': 0.01})
     clf.fit(X,y)
 
-    clf_clone = deepcopy(clf)
+    # clf_clone = deepcopy(clf)
 
-    clf2 = clf_clone
-    clf2.__class__ = DecisionTreeClassifierWithDecisionRules
+    # clf2 = clf_clone
+    # clf2.__class__ = DecisionTreeClassifierWithDecisionRules
+
+    clf2 = DecisionTreeClassifierWithDecisionRules.wrap_DecisionTreeClassifier(clf)
+
     print( clf2.decision_rules_report(X) )
 
 
