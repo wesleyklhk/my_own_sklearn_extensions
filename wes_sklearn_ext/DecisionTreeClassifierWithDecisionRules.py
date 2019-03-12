@@ -72,6 +72,7 @@ class DecisionTreeClassifierWithDecisionRules(DecisionTreeClassifier):
             decision_rules.append( tobeinserted )
 
         self.decision_rules = pd.DataFrame(decision_rules)
+        self.decision_rules['pred'] = self.predict(all_paths_with_x_and_probs[cols])
         return self.decision_rules
         
 
