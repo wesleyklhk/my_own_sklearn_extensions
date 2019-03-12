@@ -6,7 +6,7 @@ from copy import deepcopy
 
 class DecisionTreeClassifierWithDecisionRules(DecisionTreeClassifier):
     def wrap_DecisionTreeClassifier(dt_clf):
-        clf_clone = deepcopy(clf)
+        clf_clone = deepcopy(dt_clf)
         clf2 = clf_clone
         clf2.__class__ = DecisionTreeClassifierWithDecisionRules        
         return clf2
@@ -92,11 +92,6 @@ if __name__ == '__main__':
     from copy import deepcopy
     clf = DecisionTreeClassifier(random_state=0,criterion='entropy',**{'max_depth': 3, 'min_samples_leaf': 1, 'min_samples_split': 0.01})
     clf.fit(X,y)
-
-    # clf_clone = deepcopy(clf)
-
-    # clf2 = clf_clone
-    # clf2.__class__ = DecisionTreeClassifierWithDecisionRules
 
     clf2 = DecisionTreeClassifierWithDecisionRules.wrap_DecisionTreeClassifier(clf)
 
